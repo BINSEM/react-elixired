@@ -19036,7 +19036,90 @@ module.exports = require('./lib/React');
 var React = require('react');
 var ReactDOM = require('react-dom');
 
-ReactDOM.render(React.createElement('h1', null, 'Hello, world!'), document.getElementById('hello'));
+[{ "author": "Biniam", "text": "This is one comment" }, { "author": "Semere", "text": "This is author comment" }];
+
+//Comment
+var Comment = React.createClass({
+	displayName: 'Comment',
+
+	rawMarup: function rawMarup() {
+		var rawMarup = marked(this.props.children.toString(), { sanitize: true });
+		return { __html: rawMarup };
+	},
+	render: function render() {
+		return React.createElement('div', { id: 'column2', className: 'ui nine wide column segment' }, React.createElement('h2', { className: 'commentAuthor' }, this.props.author), React.createElement('span', { dangerouslySetInnerHTML: this.rawMarup() }));
+	}
+});
+
+//BiniBox
+var BiniBox = React.createClass({
+	displayName: 'BiniBox',
+
+	handleCommentSubmit: function handleCommentSubmit(comment) {
+		var comments = this.state.data;
+		comment.id = Date.now();
+		var newComments = comments.concat([comment]);
+		this.setState({ data: newComments });
+	},
+	getInitialState: function getInitialState() {
+		return { data: [] };
+	},
+	render: function render() {
+		return React.createElement('div', { className: 'commentBox' }, React.createElement(BiniList, { data: this.state.data }), React.createElement(BiniForm, { onCommentSubmit: this.handleCommentSubmit }));
+	}
+});
+
+//BiniList
+var BiniList = React.createClass({
+	displayName: 'BiniList',
+
+	render: function render() {
+		var commentNodes = this.props.data.map(function (comment) {
+			return React.createElement(Comment, { author: comment.author, key: comment.id }, comment.text);
+		});
+		return React.createElement('div', { id: 'columns', className: 'ui two column centered row segment' }, React.createElement('h1', null, 'Comments'), commentNodes);
+	}
+});
+
+//BiniForm
+var BiniForm = React.createClass({
+	displayName: 'BiniForm',
+
+	getInitialState: function getInitialState() {
+		return { author: '', text: '' };
+	},
+	handleAuthorChange: function handleAuthorChange(e) {
+		this.setState({ author: e.target.value });
+	},
+	handleTextChange: function handleTextChange(e) {
+		this.setState({ text: e.target.value });
+	},
+	handleSubmit: function handleSubmit(e) {
+		e.preventDefault();
+		var author = this.state.author.trim();
+		var text = this.state.text.trim();
+		if (!text || !author) {
+			return;
+		}
+		this.props.onCommentSubmit({ author: author, text: text });
+		this.setState({ author: '', text: '' });
+	},
+	render: function render() {
+		return React.createElement('form', { className: 'ui form', onSubmit: this.handleSubmit }, React.createElement('input', { id: 'input',
+			type: 'text',
+			placeholder: 'Your Name',
+			value: this.state.author,
+			onChange: this.handleAuthorChange
+		}), React.createElement('input', { id: 'input',
+			type: 'text',
+			placeholder: 'Say Something...',
+			value: this.state.text,
+			onChange: this.handleTextChange
+		}), React.createElement('input', { id: 'post', type: 'submit', value: 'Post' }));
+	}
+});
+
+ReactDOM.render(React.createElement(BiniBox, { url: '/api/comments.json' }), document.getElementById('main'));
 
 },{"react":158,"react-dom":29}]},{},[159]);
 
