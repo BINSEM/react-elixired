@@ -109,6 +109,7 @@ var BiniForm = React.createClass({
 
 
 ReactDOM.render(
-	<BiniBox url="/api/comments.json" />,
+	<BiniBox //url="/api/comments.json" 
+	/>,
 	document.getElementById('main')
 	);
